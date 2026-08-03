@@ -1,515 +1,263 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bola de Neve · FIIs + totais acumulados</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-            background: #eef2f0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .card {
-            max-width: 1100px;
-            width: 100%;
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 20px 40px rgba(0, 20, 10, 0.15);
-            padding: 28px 30px 35px;
-        }
-        h1 {
-            font-size: 1.9rem;
-            font-weight: 600;
-            color: #1e3a2a;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-left: 6px solid #2e7d32;
-            padding-left: 18px;
-        }
-        h1 small { font-size: 1rem; font-weight: 400; color: #3a5e47; margin-left: 8px; }
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-            border-bottom: 2px solid #dce8e2;
-            padding-bottom: 6px;
-        }
-        .tab-btn {
-            background: transparent;
-            border: none;
-            padding: 12px 24px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #3a5a47;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: 0.2s;
-            background: #f0f6f3;
-        }
-        .tab-btn:hover { background: #dcebe3; color: #14301e; }
-        .tab-btn.active { background: #1e4a2e; color: white; box-shadow: 0 4px 8px rgba(30, 74, 46, 0.2); }
-        .page { display: none; animation: fade 0.25s ease; }
-        .page.active { display: block; }
-        @keyframes fade { from { opacity: 0.3; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-        .input-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px 30px;
-            background: #f8fbfa;
-            padding: 22px 24px;
-            border-radius: 24px;
-            margin-bottom: 20px;
-            border: 1px solid #deeae4;
-        }
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .input-group label {
-            font-weight: 600;
-            color: #1a3a28;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .input-group label span {
-            color: #3f6b52;
-            font-weight: 400;
-            font-size: 0.75rem;
-            background: #e3efe9;
-            padding: 0 8px;
-            border-radius: 20px;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #cadbd3;
-            border-radius: 16px;
-            font-size: 1rem;
-            background: white;
-            transition: 0.15s;
-            font-weight: 500;
-            color: #0f2a1b;
-        }
-        .input-group input:focus {
-            border-color: #1f6e3a;
-            outline: 2px solid #8fc0a7;
-            background: #fafffd;
-        }
-        .btn-simular {
-            background: #1f4a2e;
-            border: none;
-            color: white;
-            font-weight: 700;
-            font-size: 1.2rem;
-            padding: 16px 20px;
-            border-radius: 60px;
-            width: 100%;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 6px 12px rgba(26, 70, 40, 0.25);
-            margin-top: 6px;
-        }
-        .btn-simular:hover { background: #123b22; transform: scale(0.98); }
-
-        .table-wrapper {
-            overflow-x: auto;
-            margin-top: 18px;
-            border-radius: 20px;
-            border: 1px solid #d4e3db;
-            background: white;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            min-width: 750px;
-        }
-        th {
-            background: #1f402e;
-            color: white;
-            font-weight: 600;
-            padding: 14px 10px;
-            text-align: left;
-            letter-spacing: 0.3px;
-            white-space: nowrap;
-        }
-        td {
-            padding: 12px 10px;
-            border-bottom: 1px solid #e5f0ea;
-            color: #1c3227;
-        }
-        tr:last-child td { border-bottom: none; }
-        tr:nth-child(even) { background: #f6fbf9; }
-        .total-row td { background: #dcebe1; font-weight: 700; border-top: 2px solid #2d6b47; }
-        .acumulado {
-            background: #e7f3ed;
-            font-weight: 600;
-        }
-        .info-box {
-            background: #f2f9f5;
-            border-radius: 20px;
-            padding: 20px 24px;
-            border-left: 6px solid #2b7a44;
-            margin-top: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-        .info-box .stat {
-            display: flex;
-            flex-direction: column;
-        }
-        .info-box .stat .label {
-            font-size: 0.8rem;
-            color: #2e5a41;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-        }
-        .info-box .stat .value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #0f331f;
-        }
-        .note {
-            font-size: 0.85rem;
-            color: #3b5f4b;
-            background: #ecf5f0;
-            padding: 12px 18px;
-            border-radius: 40px;
-            display: inline-block;
-            margin-top: 12px;
-        }
-        .flex-between {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .badge {
-            background: #234d33;
-            color: white;
-            padding: 4px 14px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        .input-aporte {
-            background: #e7f3ed;
-            border-radius: 20px;
-            padding: 14px 18px;
-            margin: 8px 0 16px 0;
-            border: 1px dashed #3b7a55;
-        }
-        .input-aporte label {
-            font-weight: 600;
-            color: #1a402b;
-        }
-        .input-aporte input {
-            width: 120px;
-            padding: 8px 12px;
-            border-radius: 30px;
-            border: 1px solid #b0cfbf;
-            font-weight: 500;
-            margin-left: 8px;
-        }
-        .small-hint {
-            font-size: 0.8rem;
-            color: #2d5a41;
-            background: #d9ece1;
-            padding: 4px 14px;
-            border-radius: 30px;
-            display: inline-block;
-        }
-        .acum-row td {
-            background: #e5f2ec;
-            font-weight: 500;
-            border-top: 1px dashed #87b39d;
-        }
-
-        @media (max-width: 650px) {
-            .card { padding: 18px; }
-            .input-grid { grid-template-columns: 1fr; gap: 12px; }
-            .tab-btn { padding: 10px 14px; font-size: 0.85rem; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bola de Neve · FIIs - Corrigido</title>
+<style>
+:root{
+    --bg:#eef2f0;
+    --card:#fff;
+    --ink:#173322;
+    --muted:#55705f;
+    --green:#1f4a2e;
+    --green2:#2e7d32;
+    --line:#d8e6dd;
+    --shadow:0 18px 45px #00200d20;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:15px "Segoe UI",Roboto,system-ui,sans-serif;padding:20px;min-height:100vh}
+.card{max-width:1400px;margin:auto;padding:28px;background:var(--card);border-radius:26px;box-shadow:var(--shadow)}
+h1{margin:0 0 20px;border-left:6px solid var(--green2);padding-left:16px;font-size:clamp(1.35rem,3vw,1.9rem)}
+h1 small{display:block;margin-top:5px;color:var(--muted);font-size:.82rem;font-weight:400}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+button{cursor:pointer}
+.tab{padding:11px 18px;border:0;border-radius:30px;background:#eff6f2;color:#355b43;font-weight:700;transition:all.2s}
+.tab:hover{background:#dcebe3}
+.tab.active{background:var(--green);color:#fff}
+.page{display:none}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 24px;padding:22px;background:#f8fbfa;border:1px solid var(--line);border-radius:22px}
+.field{position:relative}
+.field label{display:block;margin-bottom:6px;color:#234c32;font-weight:700}
+.field input{width:100%;padding:12px;border:1px solid #c8dbcf;border-radius:13px;font-size:1rem}
+.field input:focus{outline:2px solid #9bc8aa;border-color:var(--green2)}
+.field.resultado{margin-top:8px;padding:8px 12px;background:#e8f3ed;border-radius:10px;font-size:.9rem;color:#1a4a2a;display:none}
+.field.resultado.show{display:block}
+.primary{width:100%;margin-top:18px;padding:15px;border:0;border-radius:40px;background:var(--green);color:#fff;font-size:1.1rem;font-weight:800}
+.primary:hover{background:#123b22}
+.secondary{padding:10px 15px;border:1px solid #9ab9a5;border-radius:25px;background:#fff;color:var(--green);font-weight:700}
+.note{margin-top:16px;padding:14px 18px;background:#edf7f1;border-radius:16px;color:#315c41;line-height:1.5}
+.table-wrap{overflow:auto;margin-top:15px;border:1px solid var(--line);border-radius:18px}
+table{width:100%;min-width:900px;border-collapse:collapse}
+th{padding:13px 10px;background:#1f402e;color:#fff;text-align:left;white-space:nowrap}
+td{padding:11px 10px;border-bottom:1px solid #e4eee8;white-space:nowrap}
+tbody tr:nth-child(even){background:#f7fbf8}
+.cards{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:18px}
+.stat{padding:12px;background:#f1f8f4;border-left:4px solid var(--green2);border-radius:14px}
+.stat small{display:block;color:var(--muted);font-size:.7rem;text-transform:uppercase}
+.stat strong{display:block;margin-top:4px;font-size:1.15rem}
+.badge{display:inline-block;padding:5px 12px;background:#e0efe6;border-radius:20px;color:#245537;font-size:.8rem;font-weight:700}
+.empty{padding:25px;color:var(--muted);text-align:center}
+.destaque{background:#e8f3ed;font-weight:700}
+.destaque td{border-top:2px solid var(--green2);background:#e8f3ed}
+.inline{display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+@media(max-width:700px){body{padding:10px}.card{padding:18px;border-radius:20px}.grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.tabs{flex-direction:column}}
+</style>
 </head>
 <body>
-<div class="card">
-    <h1>
-        🌱 Bola de Neve · FIIs
-        <small>reinvestimento + aportes + acumulado</small>
-    </h1>
+<main class="card" id="app" data-valor-investido="696.37" data-valor-cota="8.30" data-dividendo="0.085" data-meses="19">
+<h1>🌱 Bola de Neve · FIIs <small>Simulação real com cotas inteiras e reinvestimento de dividendos</small></h1>
+<nav class="tabs">
+<button class="tab active" data-page="inicio">🏠 Início</button>
+<button class="tab" data-page="consolidado">📊 Relatório Consolidado</button>
+<button class="tab" data-page="individuais">📋 Transações Individuais</button>
+<button class="tab" data-page="anual">📈 Evolução Anual</button>
+</nav>
 
-    <!-- abas -->
-    <div class="tabs">
-        <button class="tab-btn active" data-page="pageConfig">📊 Dados iniciais</button>
-        <button class="tab-btn" data-page="pageResult">📈 Projeção mensal</button>
-        <button class="tab-btn" data-page="pageExtra">📋 Resumo & cotas</button>
-    </div>
-
-    <!-- PÁGINA 1: CONFIGURAÇÃO -->
-    <div id="pageConfig" class="page active">
-        <div class="input-grid">
-            <div class="input-group">
-                <label>Preço da cota (R$) <span>atual</span></label>
-                <input type="number" id="precoCota" value="696.37" step="0.01">
-            </div>
-            <div class="input-group">
-                <label>Dividendo mensal (R$) <span>por cota</span></label>
-                <input type="number" id="dividendo" value="8.30" step="0.01">
-            </div>
-            <div class="input-group">
-                <label>Cotas iniciais <span>possuo</span></label>
-                <input type="number" id="cotasIniciais" value="83" step="1">
-            </div>
-            <div class="input-group">
-                <label>Meses de projeção <span>horizonte</span></label>
-                <input type="number" id="meses" value="19" step="1" min="1">
-            </div>
-        </div>
-
-        <!-- APORTE MENSAL VARIÁVEL -->
-        <div class="input-aporte">
-            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;">
-                <label>💰 Aporte mensal extra (R$) <span class="small-hint">opcional</span></label>
-                <input type="number" id="aporteMensal" value="0" step="10" min="0" style="width:140px;">
-                <span style="color: #1f4a2e; font-size:0.9rem;">(valor fixo todo mês)</span>
-                <label style="margin-left: 10px;">📈 Crescimento anual do aporte (%)</label>
-                <input type="number" id="crescimentoAporte" value="0" step="0.5" min="0" style="width:90px;">
-            </div>
-            <div style="margin-top: 8px; font-size:0.85rem; color: #235a3b;">
-                ⚡ Exemplo: aporte R$100, crescimento 10% → mês 2 R$110, mês 3 R$121, etc.
-            </div>
-        </div>
-
-        <button class="btn-simular" onclick="calcular()">🔄 Simular reinvestimento + aportes</button>
-        <div class="note" style="margin-top:20px;">
-            ⚡ A coluna <strong>"Total investido"</strong> = soma acumulada dos aportes.
-            <br> 🔹 <strong>"Total com rend."</strong> = Total investido + rendimentos acumulados.
-        </div>
-    </div>
-
-    <!-- PÁGINA 2: RESULTADO com totais acumulados -->
-    <div id="pageResult" class="page">
-        <div class="flex-between">
-            <span class="badge">📅 evolução mensal</span>
-            <span style="color:#1d482f; font-weight:500;">totais acumulados mês a mês</span>
-        </div>
-        <div class="table-wrapper">
-            <table id="resultadoTable">
-                <thead>
-                    <tr>
-                        <th>Mês</th>
-                        <th>Cotas</th>
-                        <th>Valor cota (R$)</th>
-                        <th>Rend. mês (R$)</th>
-                        <th>Aporte (R$)</th>
-                        <th>Cotas compr.</th>
-                        <th>Total investido (R$)</th>
-                        <th>Total c/ rend. (R$)</th>
-                    </tr>
-                </thead>
-                <tbody id="resultadoBody"></tbody>
-            </table>
-        </div>
-        <div id="infoExtra" class="info-box">
-            <div class="stat"><span class="label">Cotas finais</span><span class="value" id="finalCotas">—</span></div>
-            <div class="stat"><span class="label">Patrimônio total</span><span class="value" id="finalPatrimonio">—</span></div>
-            <div class="stat"><span class="label">Último rendimento</span><span class="value" id="ultimoRendimento">—</span></div>
-            <div class="stat"><span class="label">Total aportado</span><span class="value" id="totalAportado">R$ 0</span></div>
-            <div class="stat"><span class="label">Rendimentos acum.</span><span class="value" id="totalRendimentos">R$ 0</span></div>
-        </div>
-    </div>
-
-    <!-- PÁGINA 3: RESUMO / DETALHES -->
-    <div id="pageExtra" class="page">
-        <h3 style="color:#1d482f; margin-bottom: 16px;">📋 Detalhamento da planilha original</h3>
-        <div style="background:#f7fcf9; border-radius: 20px; padding: 18px 22px; border:1px solid #d0e3d9;">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px 30px;">
-                <div><strong>Mês inicial</strong> <span style="float:right;">1</span></div>
-                <div><strong>Cotas iniciais</strong> <span style="float:right;">83</span></div>
-                <div><strong>Preço cota (R$)</strong> <span style="float:right;" id="extraPreco">696,37</span></div>
-                <div><strong>Dividendo (R$)</strong> <span style="float:right;" id="extraDividendo">8,30</span></div>
-                <div><strong>Rendimento mês 1</strong> <span style="float:right;" id="extraRend1">R$ 8,30</span></div>
-                <div><strong>Cotas compradas mês 1</strong> <span style="float:right;" id="extraCotas1">1,0</span></div>
-            </div>
-            <hr style="margin:18px 0; border-color:#c6ddd1;">
-            <div style="display:flex; flex-wrap:wrap; gap:18px 40px;">
-                <span><span style="font-weight:600;">Mês 12:</span> cotas 95 · valor R$ 802,65 · rend. R$ 9,46</span>
-                <span><span style="font-weight:600;">Mês 19:</span> cotas 103 · valor R$ 872,06 · rend. R$ 10,27</span>
-            </div>
-        </div>
-        <div style="margin-top: 22px; background:#e4f0ea; border-radius: 30px; padding: 16px 22px;">
-            <p style="font-weight:500; color:#174129;">📌 “Bola de Neve” — os dividendos compram novas cotas, aumentando o rendimento seguinte.</p>
-            <p style="font-weight:400; color:#1d4a30; margin-top:6px;">➕ Aporte mensal variável acelera o efeito, com crescimento percentual anual.</p>
-            <p style="font-weight:400; color:#1d4a30; margin-top:4px;">📊 <strong>Total investido</strong> = soma dos aportes mensais. <strong>Total c/ rend.</strong> = investido + rendimentos acumulados.</p>
-        </div>
-    </div>
+<section id="inicio" class="page active">
+<div class="grid">
+<div class="field"><label for="valorInvestido">Valor investido (R$)</label><input id="valorInvestido" type="number" step="0.01" min="0" placeholder="Ex: 1000.00"><div class="resultado" id="resultadoCotas"></div></div>
+<div class="field"><label for="valorCota">Valor da cota (R$)</label><input id="valorCota" type="number" step="0.01" min="0.01" placeholder="Ex: 10.50"></div>
+<div class="field"><label for="dividendo">Dividendo mensal por cota (R$)</label><input id="dividendo" type="number" step="0.001" min="0" placeholder="Ex: 0.085"></div>
+<div class="field"><label for="meses">Meses de projeção</label><input id="meses" type="number" step="1" min="1" placeholder="Ex: 12"></div>
 </div>
+<button class="primary" id="simular">➕ Adicionar transação</button>
+<div class="note"><b>Como funciona agora (corrigido):</b> 1) Compramos apenas cotas inteiras: <code>floor(investido / cota)</code>. O resto vira saldo. 2) Todo mês: <code>dividendo_total = cotas * dividendo_por_cota</code> -> <code>disponível = saldo + dividendo_total</code> -> compramos <code>floor(disponível / cota)</code> novas cotas. 3) Patrimônio real = <code>cotas * valor_cota + saldo</code>. Lucro = patrimônio - investido.</div>
+</section>
+
+<section id="consolidado" class="page">
+<div class="inline"><span class="badge">📊 Relatório Consolidado</span><button class="secondary" id="limpar">🗑️ Limpar todas</button></div>
+<div class="cards">
+<div class="stat"><small>Total transações</small><strong id="fTotalTransacoes">—</strong></div>
+<div class="stat"><small>Investido total</small><strong id="fInvestido">—</strong></div>
+<div class="stat"><small>Cotas totais</small><strong id="fCotas">—</strong></div>
+<div class="stat"><small>Patrimônio total</small><strong id="fPatrimonio">—</strong></div>
+<div class="stat"><small>Saldo em dinheiro</small><strong id="fSaldo">—</strong></div>
+<div class="stat"><small>Lucro acumulado</small><strong id="fGanho">—</strong></div>
+</div>
+<div class="table-wrap"><table><thead><tr><th colspan="7">📊 Resumo Consolidado</th></tr><tr><th>Total</th><th>Investido</th><th>Cotas Totais</th><th>Patrimônio</th><th>Saldo</th><th>Lucro</th><th>Status</th></tr></thead><tbody id="consolidadoBody"></tbody></table></div>
+</section>
+
+<section id="individuais" class="page">
+<div class="inline"><span class="badge">📋 Transações Individuais</span><button class="secondary" id="limparIndividuais">🗑️ Limpar todas</button></div>
+<div class="table-wrap"><table><thead><tr><th colspan="9">📋 Transações individuais - cálculo real</th></tr><tr><th>#</th><th>Investido</th><th>Cota</th><th>Cotas iniciais</th><th>Sobra inicial</th><th>Dividendo/cota</th><th>Meses</th><th>Total dividendos recebidos</th><th>Cotas finais</th></tr></thead><tbody id="transacoesIndividuaisBody"></tbody></table></div>
+</section>
+
+<section id="anual" class="page">
+<div class="inline"><span class="badge">📈 Evolução Anual Consolidada</span><button class="secondary" id="limparAnual">🗑️ Limpar todas</button></div>
+<div class="table-wrap"><table><thead><tr><th colspan="7">📊 Evolução anual (soma de todas as transações)</th></tr><tr><th>Ano</th><th>Investido</th><th>Dividendos no ano</th><th>Cotas totais</th><th>Saldo</th><th>Patrimônio</th><th>Lucro</th></tr></thead><tbody id="annualBody"></tbody></table></div>
+</section>
+</main>
 
 <script>
-    (function() {
-        // Abas
-        const tabs = document.querySelectorAll('.tab-btn');
-        const pages = {
-            config: document.getElementById('pageConfig'),
-            result: document.getElementById('pageResult'),
-            extra: document.getElementById('pageExtra')
-        };
+const $ = id => document.getElementById(id);
+const app = $("app");
+const money = v => Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const integer = v => Math.floor(Number(v)).toLocaleString("pt-BR");
 
-        tabs.forEach(btn => {
-            btn.addEventListener('click', function() {
-                tabs.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                const pageId = this.dataset.page;
-                Object.keys(pages).forEach(key => {
-                    pages[key].classList.remove('active');
-                });
-                if (pageId === 'pageConfig') pages.config.classList.add('active');
-                else if (pageId === 'pageResult') pages.result.classList.add('active');
-                else if (pageId === 'pageExtra') pages.extra.classList.add('active');
-            });
-        });
+const defaults = {
+  valorInvestido: Number(app.dataset.valorInvestido),
+  valorCota: Number(app.dataset.valorCota),
+  dividendo: Number(app.dataset.dividendo),
+  meses: Number(app.dataset.meses)
+};
 
-        // Função principal
-        window.calcular = function() {
-            // Ler entradas
-            const precoInput = document.getElementById('precoCota');
-            const divInput = document.getElementById('dividendo');
-            const cotasIniciaisInput = document.getElementById('cotasIniciais');
-            const mesesInput = document.getElementById('meses');
-            const aporteMensalInput = document.getElementById('aporteMensal');
-            const crescimentoAporteInput = document.getElementById('crescimentoAporte');
+let transacoes = [];
+let idCounter = 0;
 
-            let preco = parseFloat(precoInput.value.replace(',', '.'));
-            let div = parseFloat(divInput.value.replace(',', '.'));
-            let cotas = parseInt(cotasIniciaisInput.value);
-            let meses = parseInt(mesesInput.value);
-            let aporteBase = parseFloat(aporteMensalInput.value.replace(',', '.')) || 0;
-            let crescAnual = parseFloat(crescimentoAporteInput.value.replace(',', '.')) || 0;
+function parseVal(id, fb){
+  const raw = String($(id).value).replace(",",".");
+  const n = parseFloat(raw);
+  return Number.isFinite(n)? n : fb;
+}
 
-            // Validações
-            if (isNaN(preco) || preco <= 0) preco = 696.37;
-            if (isNaN(div) || div <= 0) div = 8.30;
-            if (isNaN(cotas) || cotas < 0) cotas = 83;
-            if (isNaN(meses) || meses < 1) meses = 19;
-            if (isNaN(aporteBase) || aporteBase < 0) aporteBase = 0;
-            if (isNaN(crescAnual) || crescAnual < 0) crescAnual = 0;
+function atualizarPreview(){
+  const inv = parseVal("valorInvestido",0);
+  const cota = parseVal("valorCota",0);
+  const div = $("resultadoCotas");
+  if(inv>0 && cota>0){
+    const qtd = Math.floor(inv/cota);
+    const sobra = inv - qtd*cota;
+    div.classList.add("show");
+    div.innerHTML = `<b>${integer(qtd)} cotas</b> compradas ${sobra>0.009?`· sobra de <b style="color:#c0392b">${money(sobra)}</b>`:""}`;
+  } else div.classList.remove("show");
+}
+["valorInvestido","valorCota"].forEach(id=>$(id).addEventListener("input",atualizarPreview));
 
-            // Atualiza campos extra
-            document.getElementById('extraPreco').innerText = preco.toFixed(2).replace('.', ',');
-            document.getElementById('extraDividendo').innerText = div.toFixed(2).replace('.', ',');
+function mudarAba(id){
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>mudarAba(b.dataset.page)));
 
-            const tbody = document.getElementById('resultadoBody');
-            tbody.innerHTML = '';
+function evoluirTransacao(t){
+  let cotas = Math.floor(t.valorInvestido / t.valorCota);
+  let saldo = t.valorInvestido - (cotas * t.valorCota);
+  let totalDividendos = 0;
+  let historicoMensal = [];
+  let historicoAnual = {}; // ano -> dados do fim do ano
 
-            let cotasAtuais = cotas;
-            let ultimoRend = 0;
-            let ultimoPatrimonio = 0;
-            let totalAportado = 0;
-            let totalRendimentos = 0;
-            let aporteMes = aporteBase;
+  for(let mes=1; mes<=t.meses; mes++){
+    const dividendoMes = cotas * t.dividendo;
+    totalDividendos += dividendoMes;
+    const disponivel = saldo + dividendoMes;
+    const compra = Math.floor(disponivel / t.valorCota);
+    saldo = disponivel - compra * t.valorCota;
+    cotas += compra;
+    const patrimonio = cotas * t.valorCota + saldo;
+    const ano = Math.ceil(mes/12);
+    if(!historicoAnual[ano]) historicoAnual[ano] = { dividendosAno:0, cotas, saldo, patrimonio };
+    historicoAnual[ano].dividendosAno += dividendoMes;
+    historicoAnual[ano].cotas = cotas;
+    historicoAnual[ano].saldo = saldo;
+    historicoAnual[ano].patrimonio = patrimonio;
+    historicoMensal.push({mes, cotas, saldo, patrimonio, dividendoMes});
+  }
+  const final = historicoMensal[historicoMensal.length-1] || {cotas: Math.floor(t.valorInvestido/t.valorCota), saldo: t.valorInvestido % t.valorCota, patrimonio: t.valorInvestido};
+  return { cotasIniciais: Math.floor(t.valorInvestido/t.valorCota), sobraInicial: t.valorInvestido - Math.floor(t.valorInvestido/t.valorCota)*t.valorCota, totalDividendos, cotasFinais: final.cotas, saldoFinal: final.saldo, patrimonioFinal: final.patrimonio, lucroFinal: final.patrimonio - t.valorInvestido, historicoAnual, historicoMensal };
+}
 
-            // Array com os valores de compra da planilha original (para referência)
-            const comprasPlanilha = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2];
+function render(){
+  if(transacoes.length===0){
+    $("consolidadoBody").innerHTML = `<tr><td colspan="7" class="empty">Nenhuma transação.</td></tr>`;
+    $("transacoesIndividuaisBody").innerHTML = `<tr><td colspan="9" class="empty">Nenhuma transação.</td></tr>`;
+    $("annualBody").innerHTML = `<tr><td colspan="7" class="empty">Adicione transações.</td></tr>`;
+    ["fTotalTransacoes","fInvestido","fCotas","fPatrimonio","fSaldo","fGanho"].forEach(id=>$(id).textContent="—");
+    return;
+  }
 
-            for (let i = 1; i <= meses; i++) {
-                // 1. Rendimento do mês
-                let rendimento = cotasAtuais * div;
+  let evolucoes = transacoes.map(t=>evoluirTransacao(t));
 
-                // 2. Aporte do mês (cresce anualmente)
-                if (i > 1) {
-                    let fatorMensal = Math.pow(1 + crescAnual / 100, 1/12);
-                    aporteMes = aporteBase * Math.pow(fatorMensal, i - 1);
-                } else {
-                    aporteMes = aporteBase;
-                }
-                aporteMes = Math.round(aporteMes * 100) / 100;
+  // Individuais
+  let htmlInd = "";
+  let somaInv = 0, somaDivTotal = 0, somaCotasIni = 0, somaSobraIni = 0;
+  evolucoes.forEach((ev,i)=>{
+    const t = transacoes[i];
+    somaInv+=t.valorInvestido; somaDivTotal+=ev.totalDividendos; somaCotasIni+=ev.cotasIniciais; somaSobraIni+=ev.sobraInicial;
+    htmlInd+=`<tr><td><b>#${i+1}</b></td><td>${money(t.valorInvestido)}</td><td>${money(t.valorCota)}</td><td>${integer(ev.cotasIniciais)}</td><td>${money(ev.sobraInicial)}</td><td>${money(t.dividendo)}</td><td>${t.meses}</td><td>${money(ev.totalDividendos)}</td><td>${integer(ev.cotasFinais)}</td></tr>`;
+  });
+  htmlInd+=`<tr class="destaque"><td>TOTAL</td><td>${money(somaInv)}</td><td>—</td><td>${integer(somaCotasIni)}</td><td>${money(somaSobraIni)}</td><td>—</td><td>—</td><td>${money(somaDivTotal)}</td><td>${integer(evolucoes.reduce((a,b)=>a+b.cotasFinais,0))}</td></tr>`;
+  $("transacoesIndividuaisBody").innerHTML = htmlInd;
 
-                // 3. Acumulados
-                totalAportado += aporteMes;
-                totalRendimentos += rendimento;
+  // Consolidado final
+  const totalInvestido = transacoes.reduce((a,t)=>a+t.valorInvestido,0);
+  const totalCotasFinais = evolucoes.reduce((a,ev)=>a+ev.cotasFinais,0);
+  const totalSaldoFinal = evolucoes.reduce((a,ev)=>a+ev.saldoFinal,0);
+  const totalPatrimonioFinal = evolucoes.reduce((a,ev)=>a+ev.patrimonioFinal,0);
+  const totalLucro = totalPatrimonioFinal - totalInvestido;
+  const status = totalLucro>0.01? "✅ Lucrativo" : totalLucro<-0.01? "⚠️ Prejuízo" : "⚖️ Neutro";
+  $("consolidadoBody").innerHTML = `<tr class="destaque"><td>${transacoes.length}</td><td>${money(totalInvestido)}</td><td>${integer(totalCotasFinais)}</td><td>${money(totalPatrimonioFinal)}</td><td>${money(totalSaldoFinal)}</td><td>${money(totalLucro)}</td><td>${status}</td></tr>`;
+  $("fTotalTransacoes").textContent = transacoes.length;
+  $("fInvestido").textContent = money(totalInvestido);
+  $("fCotas").textContent = integer(totalCotasFinais);
+  $("fPatrimonio").textContent = money(totalPatrimonioFinal);
+  $("fSaldo").textContent = money(totalSaldoFinal);
+  $("fGanho").textContent = money(totalLucro);
 
-                // 4. Total disponível para comprar cotas = rendimento + aporte
-                let totalDisponivel = rendimento + aporteMes;
+  // Anual consolidado - CORREÇÃO REAL
+  let anos = {};
+  evolucoes.forEach(ev=>{
+    Object.entries(ev.historicoAnual).forEach(([ano,d])=>{
+      if(!anos[ano]) anos[ano]={investido:0, dividendos:0, cotas:0, saldo:0, patrimonio:0};
+      // investido só conta uma vez por transação, mas para exibição anual acumulamos proporcional? Aqui somamos investido total sempre para base
+      anos[ano].dividendos += d.dividendosAno;
+      // cotas, saldo, patrimonio são snapshot do fim do ano - precisamos somar o snapshot de cada transação naquele ano
+      anos[ano].cotas += d.cotas;
+      anos[ano].saldo += d.saldo;
+      anos[ano].patrimonio += d.patrimonio;
+    });
+  });
+  // investido acumulado por ano
+  let anosOrdenados = Object.keys(anos).sort((a,b)=>a-b);
+  let htmlAnual = "";
+  anosOrdenados.forEach(ano=>{
+    const d = anos[ano];
+    d.investido = totalInvestido; // todas as transações já investidas desde ano 1 para simplificar
+    d.lucro = d.patrimonio - d.investido;
+    htmlAnual += `<tr><td>Ano ${ano}</td><td>${money(d.investido)}</td><td>${money(d.dividendos)}</td><td>${integer(d.cotas)}</td><td>${money(d.saldo)}</td><td>${money(d.patrimonio)}</td><td>${money(d.lucro)}</td></tr>`;
+  });
+  $("annualBody").innerHTML = htmlAnual || `<tr><td colspan="7" class="empty">Sem dados anuais.</td></tr>`;
+}
 
-                // 5. Quantas cotas inteiras podem ser compradas
-                let cotasCompradasInt = Math.floor(totalDisponivel / preco);
-                // 6. Exibir quantidade de cotas compradas (estilo planilha)
-                let frac = totalDisponivel / preco;
-                let compraDisplay = Math.floor(frac * 10) / 10;
-                if (compraDisplay < 0.1 && totalDisponivel > 0) compraDisplay = 0.1;
-                if (compraDisplay < 0.05) compraDisplay = 0;
+function adicionar(){
+  const t = {
+    id: ++idCounter,
+    valorInvestido: parseVal("valorInvestido",0),
+    valorCota: Math.max(parseVal("valorCota",0.01),0.01),
+    dividendo: parseVal("dividendo",0),
+    meses: Math.max(1, Math.floor(parseVal("meses",1)))
+  };
+  if(t.valorInvestido<=0) return alert("Valor investido precisa ser > 0");
+  if(t.valorCota<=0) return alert("Valor da cota precisa ser > 0");
+  transacoes.push(t);
+  render();
+  ["valorInvestido","valorCota","dividendo","meses"].forEach(id=>$(id).value="");
+  $("resultadoCotas").classList.remove("show");
+  mudarAba("consolidado");
+}
+$("simular").addEventListener("click", adicionar);
+document.querySelectorAll("#inicio input").forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();adicionar()}}));
 
-                // 7. Atualiza cotas
-                cotasAtuais += cotasCompradasInt;
+function limpar(){ if(transacoes.length && confirm("Remover todas?")){ transacoes=[]; render(); mudarAba("inicio"); } }
+["limpar","limparIndividuais","limparAnual"].forEach(id=>$(id).addEventListener("click",limpar));
 
-                // 8. Patrimônio
-                let patrimonio = cotasAtuais * preco;
-                ultimoRend = rendimento;
-                ultimoPatrimonio = patrimonio;
-
-                // 9. Total investido + rendimentos acumulados
-                let totalComRend = totalAportado + totalRendimentos;
-
-                // Formata valores
-                let rendStr = rendimento.toFixed(2).replace('.', ',');
-                let aporteStr = aporteMes.toFixed(2).replace('.', ',');
-                let compraStr = compraDisplay.toFixed(1);
-                let totalInvStr = totalAportado.toFixed(2).replace('.', ',');
-                let totalComRendStr = totalComRend.toFixed(2).replace('.', ',');
-                let precoStr = preco.toFixed(2).replace('.', ',');
-
-                // Se não houver aporte, usar a compra da planilha para os primeiros 19 meses
-                if (aporteBase === 0 && i <= comprasPlanilha.length) {
-                    compraStr = comprasPlanilha[i-1].toFixed(1);
-                }
-
-                tbody.innerHTML += `<tr>
-                    <td>${i}</td>
-                    <td><strong>${cotasAtuais}</strong></td>
-                    <td>R$ ${precoStr}</td>
-                    <td>R$ ${rendStr}</td>
-                    <td>R$ ${aporteStr}</td>
-                    <td>${compraStr}</td>
-                    <td class="acumulado">R$ ${totalInvStr}</td>
-                    <td class="acumulado">R$ ${totalComRendStr}</td>
-                </tr>`;
-            }
-
-            // Atualiza info box
-            document.getElementById('finalCotas').innerText = cotasAtuais;
-            document.getElementById('finalPatrimonio').innerText = 'R$ ' + ultimoPatrimonio.toFixed(2).replace('.', ',');
-            document.getElementById('ultimoRendimento').innerText = 'R$ ' + ultimoRend.toFixed(2).replace('.', ',');
-            document.getElementById('totalAportado').innerText = 'R$ ' + totalAportado.toFixed(2).replace('.', ',');
-            document.getElementById('totalRendimentos').innerText = 'R$ ' + totalRendimentos.toFixed(2).replace('.', ',');
-
-            // Extra rendimento mês 1
-            let rend1 = (parseInt(document.getElementById('cotasIniciais').value) || 83) * div;
-            document.getElementById('extraRend1').innerText = 'R$ ' + rend1.toFixed(2).replace('.', ',');
-            document.getElementById('extraCotas1').innerText = '1,0';
-        };
-
-        // Executa ao carregar
-        window.addEventListener('DOMContentLoaded', function() {
-            calcular();
-        });
-    })();
+// iniciar com valores do data-*
+$("valorInvestido").value = defaults.valorInvestido;
+$("valorCota").value = defaults.valorCota;
+$("dividendo").value = defaults.dividendo;
+$("meses").value = defaults.meses;
+atualizarPreview();
+render();
 </script>
 </body>
-</html>
+    </html>
