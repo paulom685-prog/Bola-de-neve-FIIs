@@ -22,235 +22,310 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bola de Neve · FIIs - FUNCIONAL</title>
+<title>Bola de Neve · FIIs</title>
 <style>
-:root{--bg:#eef2f0;--card:#fff;--ink:#173322;--muted:#55705f;--green:#1f4a2e;--green2:#2e7d32;--line:#d8e6dd;--shadow:0 18px 45px #00200d20}
+:root{
+    --bg:#eef2f0;
+    --card:#fff;
+    --ink:#173322;
+    --muted:#55705f;
+    --green:#1f4a2e;
+    --green2:#2e7d32;
+    --line:#d8e6dd;
+    --shadow:0 18px 45px #00200d20;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font:15px "Segoe UI",Roboto,sans-serif;padding:20px;min-height:100vh}
+body{background:var(--bg);color:var(--ink);font:15px "Segoe UI",Roboto,system-ui,sans-serif;padding:20px;min-height:100vh}
 .card{max-width:1400px;margin:auto;padding:28px;background:var(--card);border-radius:26px;box-shadow:var(--shadow)}
-h1{margin:0 0 20px;border-left:6px solid var(--green2);padding-left:16px;font-size:1.6rem}
-h1 small{display:block;margin-top:5px;color:var(--muted);font-size:.85rem;font-weight:400}
+h1{margin:0 0 20px;border-left:6px solid var(--green2);padding-left:16px;font-size:clamp(1.35rem,3vw,1.9rem)}
+h1 small{display:block;margin-top:5px;color:var(--muted);font-size:.82rem;font-weight:400}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;padding-bottom:8px;border-bottom:2px solid var(--line)}
-.tab{padding:11px 18px;border:0;border-radius:30px;background:#eff6f2;color:#355b43;font-weight:700;cursor:pointer}
+button{cursor:pointer}
+.tab{padding:11px 18px;border:0;border-radius:30px;background:#eff6f2;color:#355b43;font-weight:700;transition:all .2s}
+.tab:hover{background:#dcebe3}
 .tab.active{background:var(--green);color:#fff}
 .page{display:none}.page.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px 24px;padding:22px;background:#f8fbfa;border:1px solid var(--line);border-radius:22px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 24px;padding:22px;background:#f8fbfa;border:1px solid var(--line);border-radius:22px}
+.field{position:relative}
 .field label{display:block;margin-bottom:6px;color:#234c32;font-weight:700}
-.field input{width:100%;padding:12px;border:1px solid #c8dbcf;border-radius:13px;font-size:1rem}
+.field input{width:100%;padding:12px;border:1px solid #c8dbcf;border-radius:13px;font-size:1rem;text-transform:uppercase}
+.field input::placeholder{text-transform:none}
+.field input:focus{outline:2px solid #9bc8aa;border-color:var(--green2)}
 .resultado{margin-top:8px;padding:8px 12px;background:#e8f3ed;border-radius:10px;font-size:.9rem;color:#1a4a2a;display:none}
 .resultado.show{display:block}
-.primary{width:100%;margin-top:18px;padding:15px;border:0;border-radius:40px;background:var(--green);color:#fff;font-size:1.1rem;font-weight:800;cursor:pointer}
+.primary{width:100%;margin-top:18px;padding:15px;border:0;border-radius:40px;background:var(--green);color:#fff;font-size:1.1rem;font-weight:800;transition:background .2s}
 .primary:hover{background:#123b22}
-.secondary{padding:10px 15px;border:1px solid #9ab9a5;border-radius:25px;background:#fff;color:var(--green);font-weight:700;cursor:pointer}
+.secondary{padding:10px 15px;border:1px solid #9ab9a5;border-radius:25px;background:#fff;color:var(--green);font-weight:700}
+.note{margin-top:16px;padding:14px 18px;background:#edf7f1;border-radius:16px;color:#315c41;line-height:1.5}
 .table-wrap{overflow:auto;margin-top:15px;border:1px solid var(--line);border-radius:18px}
-table{width:100%;min-width:900px;border-collapse:collapse}
-th{padding:12px 10px;background:#1f402e;color:#fff;text-align:left}
+table{width:100%;min-width:1000px;border-collapse:collapse}
+th{padding:13px 10px;background:#1f402e;color:#fff;text-align:left;white-space:nowrap}
 td{padding:11px 10px;border-bottom:1px solid #e4eee8;white-space:nowrap}
 tbody tr:nth-child(even){background:#f7fbf8}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.cards{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:18px}
 .stat{padding:12px;background:#f1f8f4;border-left:4px solid var(--green2);border-radius:14px}
 .stat small{display:block;color:var(--muted);font-size:.7rem;text-transform:uppercase}
-.stat strong{display:block;margin-top:4px;font-size:1.1rem}
+.stat strong{display:block;margin-top:4px;font-size:1.15rem}
 .badge{display:inline-block;padding:5px 12px;background:#e0efe6;border-radius:20px;color:#245537;font-size:.8rem;font-weight:700}
+.badge-ativo{display:inline-block;padding:4px 10px;background:#1f4a2e;color:#fff;border-radius:12px;font-weight:800;font-size:.85rem;letter-spacing:.5px}
 .empty{padding:25px;color:var(--muted);text-align:center}
 .destaque{background:#e8f3ed;font-weight:700}
-.inline{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
-@media(max-width:700px){.grid{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.tabs{flex-direction:column}}
+.destaque td{border-top:2px solid var(--green2);background:#e8f3ed}
+.inline{display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+@media(max-width:800px){body{padding:10px}.card{padding:18px;border-radius:20px}.grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.tabs{flex-direction:column}.tab{text-align:center}}
 </style>
 </head>
 <body>
-<main class="card">
-<h1>🌱 Bola de Neve · FIIs <small>Botões 100% funcionais - Cálculo real</small></h1>
+<main class="card" id="app">
+<h1>🌱 Bola de Neve · FIIs <small>Transações com valor investido, valor da cota e cotas inteiras - cálculo real</small></h1>
 <nav class="tabs">
-<button type="button" class="tab active" onclick="mudarAba('inicio')">🏠 Início</button>
-<button type="button" class="tab" onclick="mudarAba('consolidado')">📊 Consolidado</button>
-<button type="button" class="tab" onclick="mudarAba('individuais')">📋 Transações</button>
-<button type="button" class="tab" onclick="mudarAba('patrimonial')">📈 EVOLUÇÃO PATRIMONIAL</button>
+<button class="tab active" data-page="inicio">🏠 Início</button>
+<button class="tab" data-page="consolidado">📊 Relatório Consolidado</button>
+<button class="tab" data-page="individuais">📋 Transações Individuais</button>
+<button class="tab" data-page="anual">📈 Evolução Anual</button>
 </nav>
 
 <section id="inicio" class="page active">
 <div class="grid">
-<div class="field"><label>🏷️ Nome do Ativo *</label><input id="nomeAtivo" type="text" placeholder="Ex: HGLG11" style="text-transform:uppercase;font-weight:bold"></div>
-<div class="field"><label>💰 Valor investido (R$)</label><input id="valorInvestido" type="number" step="0.01" placeholder="1000"><div class="resultado" id="resultadoCotas"></div></div>
-<div class="field"><label>🎫 Valor da cota (R$)</label><input id="valorCota" type="number" step="0.01" placeholder="10.50"></div>
-<div class="field"><label>💸 Dividendo por cota (R$)</label><input id="dividendo" type="number" step="0.001" placeholder="0.085"></div>
-<div class="field"><label>📅 Meses</label><input id="meses" type="number" step="1" placeholder="12"></div>
+<div class="field"><label for="ativo">Ativo / Código FII</label><input id="ativo" type="text" maxlength="10" placeholder="Ex: HGLG11, MXRF11"></div>
+<div class="field"><label for="valorInvestido">Valor investido (R$)</label><input id="valorInvestido" type="number" step="0.01" min="0" placeholder="Ex: 1000.00"><div class="resultado" id="resultadoCotas"></div></div>
+<div class="field"><label for="valorCota">Valor da cota (R$)</label><input id="valorCota" type="number" step="0.01" min="0.01" placeholder="Ex: 10.50"></div>
+<div class="field"><label for="dividendo">Dividendo mensal por cota (R$)</label><input id="dividendo" type="number" step="0.001" min="0" placeholder="Ex: 0.085"></div>
+<div class="field"><label for="meses">Meses de projeção</label><input id="meses" type="number" step="1" min="1" placeholder="Ex: 12"></div>
 </div>
-<button type="button" class="primary" onclick="adicionarTransacao()">➕ Adicionar transação</button>
+<button class="primary" id="simular">➕ Adicionar transação</button>
+<div class="note"><b>Corrigido:</b> Compra apenas de cotas inteiras. Dividendos reinvestidos compram novas cotas inteiras. Patrimônio = (cotas * valor cota) + saldo em dinheiro. Após adicionar, todos os campos da tela inicial são limpos automaticamente.</div>
 </section>
 
 <section id="consolidado" class="page">
-<div class="inline"><span class="badge">📊 Consolidado</span><button type="button" class="secondary" onclick="limparTudo()">🗑️ Limpar todas</button></div>
+<div class="inline"><span class="badge">📊 Relatório Consolidado</span><button class="secondary" id="limpar">🗑️ Limpar todas</button></div>
 <div class="cards">
-<div class="stat"><small>Ativos</small><strong id="fAtivos">—</strong></div>
-<div class="stat"><small>Investido</small><strong id="fInvestido">—</strong></div>
-<div class="stat"><small>Cotas</small><strong id="fCotas">—</strong></div>
-<div class="stat"><small>Patrimônio</small><strong id="fPatrimonio">—</strong></div>
-<div class="stat"><small>Saldo</small><strong id="fSaldo">—</strong></div>
-<div class="stat"><small>Lucro</small><strong id="fGanho">—</strong></div>
+<div class="stat"><small>Total de transações</small><strong id="fTotalTransacoes">—</strong></div>
+<div class="stat"><small>Valor investido total</small><strong id="fInvestido">—</strong></div>
+<div class="stat"><small>Cotas totais</small><strong id="fCotas">—</strong></div>
+<div class="stat"><small>Patrimônio total</small><strong id="fPatrimonio">—</strong></div>
+<div class="stat"><small>Saldo em dinheiro</small><strong id="fSaldo">—</strong></div>
+<div class="stat"><small>Lucro acumulado</small><strong id="fGanho">—</strong></div>
 </div>
-<div class="table-wrap"><table><thead><tr><th>Transações</th><th>Ativos</th><th>Investido</th><th>Cotas</th><th>Patrimônio</th><th>Lucro</th></tr></thead><tbody id="consolidadoBody"><tr><td colspan="6" class="empty">Nenhum ativo</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th colspan="8">📊 Resumo Consolidado</th></tr><tr><th>Ativo</th><th>Total Transações</th><th>Valor Investido</th><th>Cotas Totais</th><th>Patrimônio</th><th>Saldo</th><th>Lucro</th><th>Status</th></tr></thead><tbody id="consolidadoBody"></tbody></table></div>
 </section>
 
 <section id="individuais" class="page">
-<div class="inline"><span class="badge">📋 Transações por Ativo</span><button type="button" class="secondary" onclick="limparTudo()">🗑️ Limpar todas</button></div>
-<div class="table-wrap"><table><thead><tr><th>#</th><th>ATIVO</th><th>Investido</th><th>Cota</th><th>Cotas Ini</th><th>Sobra</th><th>Div</th><th>Meses</th><th>Total Div</th><th>Cotas Fim</th></tr></thead><tbody id="transacoesBody"><tr><td colspan="10" class="empty">Nenhum ativo</td></tr></tbody></table></div>
+<div class="inline"><span class="badge">📋 Transações Individuais</span><button class="secondary" id="limparIndividuais">🗑️ Limpar todas</button></div>
+<div class="table-wrap"><table><thead><tr><th colspan="10">📋 Transações individuais</th></tr><tr><th>#</th><th>Ativo</th><th>Valor investido</th><th>Valor da cota</th><th>Cotas iniciais</th><th>Sobra (R$)</th><th>Dividendo mensal</th><th>Meses</th><th>Total de dividendos</th><th>Cotas finais</th></tr></thead><tbody id="transacoesIndividuaisBody"></tbody></table></div>
 </section>
 
-<section id="patrimonial" class="page">
-<div class="inline"><span class="badge">📈 EVOLUÇÃO PATRIMONIAL por FUNDO</span><button type="button" class="secondary" onclick="limparTudo()">🗑️ Limpar todas</button></div>
-<div class="table-wrap"><table><thead><tr><th>FUNDO / ATIVO</th><th>Investido</th><th>Dividendos</th><th>Cotas Totais</th><th>Sobra</th><th>Patrimônio</th><th>Lucro</th></tr></thead><tbody id="patrimonialBody"><tr><td colspan="7" class="empty">Adicione ativos</td></tr></tbody></table></div>
+<section id="anual" class="page">
+<div class="inline"><span class="badge">📈 Evolução Anual Consolidada</span><button class="secondary" id="limparAnual">🗑️ Limpar todas</button></div>
+<div class="table-wrap"><table><thead><tr><th colspan="8">📊 Evolução anual consolidada</th></tr><tr><th>Ano</th><th>Ativo</th><th>Valor investido</th><th>Dividendos no ano</th><th>Cotas totais</th><th>Sobra (R$)</th><th>Patrimônio</th><th>Lucro</th></tr></thead><tbody id="annualBody"></tbody></table></div>
 </section>
 </main>
 
 <script>
-var transacoes = [];
-function $(id){return document.getElementById(id);}
-function money(v){return Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});}
-function inteiro(v){return Math.floor(Number(v)).toLocaleString("pt-BR");}
-function getVal(id, def){var s = String($(id).value).trim().replace(",","."); if(s==="") return def; var n=parseFloat(s); return isNaN(n)?def:n;}
+const $ = id => document.getElementById(id);
+const money = v => Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const integer = v => Math.floor(Number(v)).toLocaleString("pt-BR");
 
-function limparCampos(){
-  $("nomeAtivo").value="";
-  $("valorInvestido").value="";
-  $("valorCota").value="";
-  $("dividendo").value="";
-  $("meses").value="";
-  var r=$("resultadoCotas"); r.className="resultado"; r.innerHTML="";
-  $("nomeAtivo").focus();
+let transacoes = [];
+let idCounter = 0;
+
+const STORAGE_KEY = "bolaDeNeveFIIs_v2_com_ativo";
+
+function salvarNoStorage(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ transacoes, idCounter }));
+}
+function carregarDoStorage(){
+  // tenta migrar da versão antiga
+  const oldData = localStorage.getItem("bolaDeNeveFIIs_transacoes") || localStorage.getItem("bolaDeNeveFIIs_v1");
+  let dados = localStorage.getItem(STORAGE_KEY);
+  if(!dados && oldData) dados = oldData;
+  if(dados){
+    try{
+      const obj = JSON.parse(dados);
+      transacoes = (obj.transacoes || []).map(t => ({ ativo: t.ativo || "GERAL", ...t }));
+      idCounter = obj.idCounter || 0;
+    }catch(e){}
+  }
+}
+
+function parseVal(id, fb){
+  const raw = String($(id).value).trim().replace(",",".");
+  if(raw==="") return fb;
+  const n = parseFloat(raw);
+  return Number.isFinite(n) ? n : fb;
+}
+
+function limparCamposInicio(){
+  ["ativo","valorInvestido","valorCota","dividendo","meses"].forEach(id => {
+    $(id).value = "";
+  });
+  const res = $("resultadoCotas");
+  res.classList.remove("show");
+  res.innerHTML = "";
+  $("ativo").focus();
 }
 
 function atualizarPreview(){
-  var inv=getVal("valorInvestido",0), cota=getVal("valorCota",0);
-  var div=$("resultadoCotas");
+  const inv = parseVal("valorInvestido",0);
+  const cota = parseVal("valorCota",0);
+  const div = $("resultadoCotas");
   if(inv>0 && cota>0){
-    var q=Math.floor(inv/cota);
-    var s=inv-q*cota;
-    div.className="resultado show";
-    var nome=$("nomeAtivo").value.toUpperCase();
-    div.innerHTML=(nome?nome+": ":"")+inteiro(q)+" cotas"+(s>0.009?" · sobra "+money(s):"");
-  }else{
-    div.className="resultado";
+    const qtd = Math.floor(inv/cota);
+    const sobra = inv - qtd*cota;
+    div.classList.add("show");
+    div.innerHTML = `<b>${integer(qtd)} cotas</b> compradas ${sobra>0.009?`· sobra <b style="color:#c0392b">${money(sobra)}</b>`:"· sem sobra"}`;
+  } else {
+    div.classList.remove("show");
+    div.innerHTML="";
   }
 }
+["valorInvestido","valorCota"].forEach(id=>$(id).addEventListener("input",atualizarPreview));
 
 function mudarAba(id){
-  var tabs=document.querySelectorAll(".tab");
-  for(var i=0;i<tabs.length;i++){tabs[i].classList.remove("active");}
-  var pages=document.querySelectorAll(".page");
-  for(var i=0;i<pages.length;i++){pages[i].classList.remove("active");}
-  // ativa pelo nome
-  var map={"inicio":0,"consolidado":1,"individuais":2,"patrimonial":3};
-  if(map[id]!==undefined) tabs[map[id]].classList.add("active");
-  $(id).classList.add("active");
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
 }
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>mudarAba(b.dataset.page)));
 
-function evoluir(t){
-  var cotas=Math.floor(t.valorInvestido/t.valorCota);
-  var saldo=t.valorInvestido-cotas*t.valorCota;
-  var totalDiv=0;
-  for(var m=1;m<=t.meses;m++){
-    var d=cotas*t.dividendo;
-    totalDiv+=d;
-    var disp=saldo+d;
-    var compra=Math.floor(disp/t.valorCota);
-    saldo=disp-compra*t.valorCota;
-    cotas+=compra;
+function evoluirTransacao(t){
+  let cotas = Math.floor(t.valorInvestido / t.valorCota);
+  let saldo = t.valorInvestido - (cotas * t.valorCota);
+  let totalDividendos = 0;
+  let historicoAnual = {};
+  let historicoMensal = [];
+  for(let mes=1; mes<=t.meses; mes++){
+    const dividendoMes = cotas * t.dividendo;
+    totalDividendos += dividendoMes;
+    const disponivel = saldo + dividendoMes;
+    const compra = Math.floor(disponivel / t.valorCota);
+    saldo = disponivel - compra * t.valorCota;
+    cotas += compra;
+    const patrimonio = cotas * t.valorCota + saldo;
+    const ano = Math.ceil(mes/12);
+    if(!historicoAnual[ano]) historicoAnual[ano] = { dividendosAno:0, cotas, saldo, patrimonio };
+    historicoAnual[ano].dividendosAno += dividendoMes;
+    historicoAnual[ano].cotas = cotas;
+    historicoAnual[ano].saldo = saldo;
+    historicoAnual[ano].patrimonio = patrimonio;
+    historicoMensal.push({mes, cotas, saldo, patrimonio, dividendoMes});
   }
-  return{
-    cotasIniciais:Math.floor(t.valorInvestido/t.valorCota),
-    sobraInicial:t.valorInvestido-Math.floor(t.valorInvestido/t.valorCota)*t.valorCota,
-    totalDiv:totalDiv,
-    cotasFinais:cotas,
-    saldoFinal:saldo,
-    patrimonio:cotas*t.valorCota+saldo
-  };
+  const final = historicoMensal[historicoMensal.length-1] || {cotas, saldo, patrimonio: t.valorInvestido};
+  return { cotasIniciais: Math.floor(t.valorInvestido/t.valorCota), sobraInicial: t.valorInvestido - Math.floor(t.valorInvestido/t.valorCota)*t.valorCota, totalDividendos, cotasFinais: final.cotas, saldoFinal: final.saldo, patrimonioFinal: final.patrimonio, lucroFinal: final.patrimonio - t.valorInvestido, historicoAnual };
 }
 
 function render(){
   if(transacoes.length===0){
-    $("consolidadoBody").innerHTML='<tr><td colspan="6" class="empty">Nenhum ativo</td></tr>';
-    $("transacoesBody").innerHTML='<tr><td colspan="10" class="empty">Nenhum ativo</td></tr>';
-    $("patrimonialBody").innerHTML='<tr><td colspan="7" class="empty">Adicione ativos</td></tr>';
-    ["fAtivos","fInvestido","fCotas","fPatrimonio","fSaldo","fGanho"].forEach(function(id){$(id).textContent="—";});
-    return;
-  }
-  var evs=transacoes.map(evoluir);
-  // individuais
-  var htmlInd="";
-  for(var i=0;i<transacoes.length;i++){
-    var t=transacoes[i], ev=evs[i];
-    htmlInd+='<tr><td>#'+(i+1)+'</td><td><b>'+t.ativo+'</b></td><td>'+money(t.valorInvestido)+'</td><td>'+money(t.valorCota)+'</td><td>'+inteiro(ev.cotasIniciais)+'</td><td>'+money(ev.sobraInicial)+'</td><td>'+money(t.dividendo)+'</td><td>'+t.meses+'</td><td>'+money(ev.totalDiv)+'</td><td><b>'+inteiro(ev.cotasFinais)+'</b></td></tr>';
-  }
-  $("transacoesBody").innerHTML=htmlInd;
+    $("consolidadoBody").innerHTML = `<tr><td colspan="8" class="empty">Nenhuma transação adicionada.</td></tr>`;
+    $("transacoesIndividuaisBody").innerHTML = `<tr><td colspan="10" class="empty">Nenhuma transação adicionada.</td></tr>`;
+    $("annualBody").innerHTML = `<tr><td colspan="8" class="empty">Adicione pelo menos uma transação.</td></tr>`;
+    ["fTotalTransacoes","fInvestido","fCotas","fPatrimonio","fSaldo","fGanho"].forEach(id=>$(id).textContent="—");
+  } else {
+    let evolucoes = transacoes.map(t=>evoluirTransacao(t));
 
-  var totalInv=0,totalCotas=0,totalSaldo=0,totalPat=0,totalDiv=0;
-  for(var j=0;j<evs.length;j++){totalInv+=transacoes[j].valorInvestido; totalCotas+=evs[j].cotasFinais; totalSaldo+=evs[j].saldoFinal; totalPat+=evs[j].patrimonio; totalDiv+=evs[j].totalDiv;}
-  var unicos={}; transacoes.forEach(function(t){unicos[t.ativo]=1;}); var qtdAtivos=Object.keys(unicos).length;
+    // AGRUPAR POR ATIVO PARA CONSOLIDADO
+    let porAtivo = {};
+    transacoes.forEach((t,i)=>{
+      const key = (t.ativo||"GERAL").toUpperCase();
+      if(!porAtivo[key]) porAtivo[key] = { transacoes: [], evolucoes: [], totalInv:0 };
+      porAtivo[key].transacoes.push(t);
+      porAtivo[key].evolucoes.push(evolucoes[i]);
+      porAtivo[key].totalInv += t.valorInvestido;
+    });
 
-  $("consolidadoBody").innerHTML='<tr class="destaque"><td>'+transacoes.length+'</td><td>'+qtdAtivos+'</td><td>'+money(totalInv)+'</td><td>'+inteiro(totalCotas)+'</td><td>'+money(totalPat)+'</td><td>'+money(totalPat-totalInv)+'</td></tr>';
-  $("fAtivos").textContent=qtdAtivos;
-  $("fInvestido").textContent=money(totalInv);
-  $("fCotas").textContent=inteiro(totalCotas);
-  $("fPatrimonio").textContent=money(totalPat);
-  $("fSaldo").textContent=money(totalSaldo);
-  $("fGanho").textContent=money(totalPat-totalInv);
+    // Individuais - agora com ativo
+    let htmlInd = "";
+    evolucoes.forEach((ev,i)=>{
+      const t = transacoes[i];
+      htmlInd+=`<tr><td><b>#${i+1}</b></td><td><span class="badge-ativo">${(t.ativo||"GERAL").toUpperCase()}</span></td><td>${money(t.valorInvestido)}</td><td>${money(t.valorCota)}</td><td>${integer(ev.cotasIniciais)}</td><td>${money(ev.sobraInicial)}</td><td>${money(t.dividendo)}</td><td>${t.meses}</td><td>${money(ev.totalDividendos)}</td><td>${integer(ev.cotasFinais)}</td></tr>`;
+    });
+    const totalInv = transacoes.reduce((a,t)=>a+t.valorInvestido,0);
+    htmlInd+=`<tr class="destaque"><td>TOTAL</td><td>${Object.keys(porAtivo).length} ativos</td><td>${money(totalInv)}</td><td>—</td><td>${integer(evolucoes.reduce((a,e)=>a+e.cotasIniciais,0))}</td><td>${money(evolucoes.reduce((a,e)=>a+e.sobraInicial,0))}</td><td>—</td><td>—</td><td>${money(evolucoes.reduce((a,e)=>a+e.totalDividendos,0))}</td><td>${integer(evolucoes.reduce((a,e)=>a+e.cotasFinais,0))}</td></tr>`;
+    $("transacoesIndividuaisBody").innerHTML = htmlInd;
 
-  // patrimonial por FUNDO
-  var porFundo={};
-  for(var k=0;k<transacoes.length;k++){
-    var nome=transacoes[k].ativo;
-    if(!porFundo[nome]) porFundo[nome]={inv:0,div:0,cotas:0,saldo:0,pat:0};
-    porFundo[nome].inv+=transacoes[k].valorInvestido;
-    porFundo[nome].div+=evs[k].totalDiv;
-    porFundo[nome].cotas+=evs[k].cotasFinais;
-    porFundo[nome].saldo+=evs[k].saldoFinal;
-    porFundo[nome].pat+=evs[k].patrimonio;
+    // Consolidado por ativo + total geral
+    let htmlCons = "";
+    Object.entries(porAtivo).forEach(([ativo, g])=>{
+      const totalCotasFinais = g.evolucoes.reduce((a,ev)=>a+ev.cotasFinais,0);
+      const totalSaldoFinal = g.evolucoes.reduce((a,ev)=>a+ev.saldoFinal,0);
+      const totalPatrimonioFinal = g.evolucoes.reduce((a,ev)=>a+ev.patrimonioFinal,0);
+      const totalLucro = totalPatrimonioFinal - g.totalInv;
+      htmlCons += `<tr><td><span class="badge-ativo">${ativo}</span></td><td>${g.transacoes.length}</td><td>${money(g.totalInv)}</td><td>${integer(totalCotasFinais)}</td><td>${money(totalPatrimonioFinal)}</td><td>${money(totalSaldoFinal)}</td><td>${money(totalLucro)}</td><td style="color:${totalLucro>=0?"#2e7d32":"#c0392b"};font-weight:700">${totalLucro>=0?"✅ Lucrativo":"⚠️ Prejuízo"}</td></tr>`;
+    });
+    // Total geral
+    const totalCotasFinais = evolucoes.reduce((a,ev)=>a+ev.cotasFinais,0);
+    const totalSaldoFinal = evolucoes.reduce((a,ev)=>a+ev.saldoFinal,0);
+    const totalPatrimonioFinal = evolucoes.reduce((a,ev)=>a+ev.patrimonioFinal,0);
+    const totalLucro = totalPatrimonioFinal - totalInv;
+    htmlCons += `<tr class="destaque"><td>TOTAL GERAL</td><td><strong>${transacoes.length}</strong></td><td>${money(totalInv)}</td><td>${integer(totalCotasFinais)}</td><td>${money(totalPatrimonioFinal)}</td><td>${money(totalSaldoFinal)}</td><td>${money(totalLucro)}</td><td style="color:${totalLucro>=0?"#2e7d32":"#c0392b"};font-weight:700">${totalLucro>=0?"✅ Lucrativo":"⚠️ Prejuízo"}</td></tr>`;
+    $("consolidadoBody").innerHTML = htmlCons;
+
+    $("fTotalTransacoes").textContent = transacoes.length;
+    $("fInvestido").textContent = money(totalInv);
+    $("fCotas").textContent = integer(totalCotasFinais);
+    $("fPatrimonio").textContent = money(totalPatrimonioFinal);
+    $("fSaldo").textContent = money(totalSaldoFinal);
+    $("fGanho").textContent = money(totalLucro);
+
+    // Anual por ativo
+    let anos = {};
+    evolucoes.forEach((ev, idx)=>{
+      const ativo = (transacoes[idx].ativo||"GERAL").toUpperCase();
+      Object.entries(ev.historicoAnual).forEach(([ano,d])=>{
+        const key = ano+"_"+ativo;
+        if(!anos[key]) anos[key]={ano, ativo, dividendos:0,cotas:0,saldo:0,patrimonio:0, investido:0};
+        anos[key].dividendos+=d.dividendosAno;
+        anos[key].cotas=d.cotas;
+        anos[key].saldo=d.saldo;
+        anos[key].patrimonio=d.patrimonio;
+        anos[key].investido = porAtivo[ativo]?.totalInv || 0;
+      });
+    });
+    let htmlAnual="";
+    Object.values(anos).sort((a,b)=>a.ano-b.ano || a.ativo.localeCompare(b.ativo)).forEach(d=>{
+      htmlAnual+=`<tr><td>Ano ${d.ano}</td><td><span class="badge-ativo">${d.ativo}</span></td><td>${money(d.investido)}</td><td>${money(d.dividendos)}</td><td>${integer(d.cotas)}</td><td>${money(d.saldo)}</td><td>${money(d.patrimonio)}</td><td>${money(d.patrimonio-d.investido)}</td></tr>`;
+    });
+    $("annualBody").innerHTML = htmlAnual;
   }
-  var htmlPat="";
-  var nomes=Object.keys(porFundo).sort();
-  for(var n=0;n<nomes.length;n++){
-    var f=nomes[n], d=porFundo[f];
-    htmlPat+='<tr><td><b>'+f+'</b></td><td>'+money(d.inv)+'</td><td>'+money(d.div)+'</td><td>'+inteiro(d.cotas)+'</td><td>'+money(d.saldo)+'</td><td><b>'+money(d.pat)+'</b></td><td>'+money(d.pat-d.inv)+'</td></tr>';
-  }
-  htmlPat+='<tr class="destaque"><td>TOTAL ('+qtdAtivos+' ATIVOS)</td><td>'+money(totalInv)+'</td><td>'+money(totalDiv)+'</td><td>'+inteiro(totalCotas)+'</td><td>'+money(totalSaldo)+'</td><td>'+money(totalPat)+'</td><td>'+money(totalPat-totalInv)+'</td></tr>';
-  $("patrimonialBody").innerHTML=htmlPat;
+  salvarNoStorage();
 }
 
 function adicionarTransacao(){
-  var ativo=String($("nomeAtivo").value).trim().toUpperCase();
-  if(!ativo){alert("Digite o Nome do Ativo! Ex: HGLG11"); $("nomeAtivo").focus(); return;}
-  var t={
-    ativo:ativo,
-    valorInvestido:getVal("valorInvestido",0),
-    valorCota:Math.max(getVal("valorCota",0.01),0.01),
-    dividendo:getVal("dividendo",0),
-    meses:Math.max(1,Math.floor(getVal("meses",1)))
+  const ativoVal = String($("ativo").value || "").trim().toUpperCase() || "GERAL";
+  const t = {
+    id: ++idCounter,
+    ativo: ativoVal,
+    valorInvestido: parseVal("valorInvestido",0),
+    valorCota: Math.max(parseVal("valorCota",0.01),0.01),
+    dividendo: parseVal("dividendo",0),
+    meses: Math.max(1, Math.floor(parseVal("meses",1))),
+    timestamp: new Date().toLocaleString("pt-BR")
   };
-  if(t.valorInvestido<=0){alert("Valor investido deve ser maior que zero"); return;}
+  if(t.valorInvestido<=0) return alert("O valor investido deve ser maior que zero.");
+  if(t.valorCota<=0) return alert("Valor da cota inválido.");
+
   transacoes.push(t);
   render();
-  limparCampos();
-  mudarAba('patrimonial');
+  limparCamposInicio();
+  mudarAba("consolidado");
 }
 
-function limparTudo(){
-  if(transacoes.length===0){limparCampos(); return;}
-  if(confirm("Remover todas as transações?")){
+$("simular").addEventListener("click", adicionarTransacao);
+document.querySelectorAll("#inicio input").forEach(i=>i.addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();adicionarTransacao()}}));
+
+function limparTodas(){
+  if(transacoes.length===0) return;
+  if(confirm("Tem certeza que deseja remover todas as transações?")){
     transacoes=[];
+    idCounter = 0;
     render();
-    limparCampos();
-    mudarAba('inicio');
+    limparCamposInicio();
+    mudarAba("inicio");
   }
 }
+["limpar","limparIndividuais","limparAnual"].forEach(id=>$(id).addEventListener("click",limparTodas));
 
-// listeners
-$("nomeAtivo").addEventListener("input", atualizarPreview);
-$("valorInvestido").addEventListener("input", atualizarPreview);
-$("valorCota").addEventListener("input", atualizarPreview);
-document.addEventListener("keydown", function(e){ if(e.key==="Enter"){ e.preventDefault(); adicionarTransacao(); } });
-
-limparCampos();
+carregarDoStorage();
+limparCamposInicio();
 render();
 </script>
 </body>
