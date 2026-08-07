@@ -317,7 +317,6 @@
             <button class="tab active" data-page="inicio">🏠 Início</button>
             <button class="tab" data-page="consolidado">📊 Relatório Consolidado</button>
             <button class="tab" data-page="individuais">📋 Transações Individuais</button>
-            <button class="tab" data-page="anual">📈 Evolução Anual</button>
         </nav>
 
         <section id="inicio" class="page active">
@@ -348,11 +347,6 @@
         <section id="individuais" class="page">
             <div class="inline"><span class="badge">📋 Transações Individuais</span><button class="secondary" id="limparIndividuais">🗑️ Limpar todas</button></div>
             <div class="table-wrap"><table><thead><tr><th colspan="10">📋 Transações individuais</th></tr><tr><th>#</th><th>Ativo</th><th>Valor investido</th><th>Valor da cota</th><th>Cotas iniciais</th><th>Sobra (R$)</th><th>Dividendo mensal</th><th>Meses</th><th>Total de dividendos</th><th>Cotas finais</th></tr></thead><tbody id="transacoesIndividuaisBody"></tbody></table></div>
-        </section>
-
-        <section id="anual" class="page">
-            <div class="inline"><span class="badge">📈 Evolução Anual Consolidada</span><button class="secondary" id="limparAnual">🗑️ Limpar todas</button></div>
-            <div class="table-wrap"><table><thead><tr><th colspan="8">📊 Evolução anual consolidada</th></tr><tr><th>Ano</th><th>Ativo</th><th>Valor investido</th><th>Dividendos no ano</th><th>Cotas totais</th><th>Sobra (R$)</th><th>Patrimônio</th><th>Lucro</th></tr></thead><tbody id="annualBody"></tbody></table></div>
         </section>
     </main>
 
@@ -462,7 +456,6 @@
             if (transacoes.length === 0) {
                 $("consolidadoBody").innerHTML = `<tr><td colspan="8" class="empty">Nenhuma transação adicionada.</td></tr>`;
                 $("transacoesIndividuaisBody").innerHTML = `<tr><td colspan="10" class="empty">Nenhuma transação adicionada.</td></tr>`;
-                $("annualBody").innerHTML = `<tr><td colspan="8" class="empty">Adicione pelo menos uma transação.</td></tr>`;
                 ["fTotalTransacoes", "fInvestido", "fCotas", "fPatrimonio", "fSaldo", "fGanho"].forEach(id => $(id)
                     .textContent = "—");
             } else {
@@ -518,28 +511,6 @@
                 $("fPatrimonio").textContent = money(totalPatrimonioFinalGeral);
                 $("fSaldo").textContent = money(totalSaldoFinalGeral);
                 $("fGanho").textContent = money(totalLucroGeral);
-
-                // Anual por ativo
-                let anos = {};
-                evolucoes.forEach((ev, idx) => {
-                    const ativo = (transacoes[idx].ativo || "GERAL").toUpperCase();
-                    Object.entries(ev.historicoAnual).forEach(([ano, d]) => {
-                        const key = ano + "_" + ativo;
-                        if (!anos[key]) anos[key] = { ano, ativo, dividendos: 0, cotas: 0, saldo: 0,
-                            patrimonio: 0, investido: 0 };
-                        anos[key].dividendos += d.dividendosAno;
-                        anos[key].cotas = d.cotas;
-                        anos[key].saldo = d.saldo;
-                        anos[key].patrimonio = d.patrimonio;
-                        anos[key].investido = porAtivo[ativo]?.totalInv || 0;
-                    });
-                });
-                let htmlAnual = "";
-                Object.values(anos).sort((a, b) => a.ano - b.ano || a.ativo.localeCompare(b.ativo)).forEach(d => {
-                    htmlAnual +=
-                        `<tr><td>Ano ${d.ano}</td><td><span class="badge-ativo">${d.ativo}</span></td><td>${money(d.investido)}</td><td>${money(d.dividendos)}</td><td>${integer(d.cotas)}</td><td>${money(d.saldo)}</td><td>${money(d.patrimonio)}</td><td>${money(d.patrimonio - d.investido)}</td></tr>`;
-                });
-                $("annualBody").innerHTML = htmlAnual;
             }
             salvarNoStorage();
         }
@@ -580,11 +551,11 @@
                 mudarAba("inicio");
             }
         }
-        ["limpar", "limparIndividuais", "limparAnual"].forEach(id => $(id).addEventListener("click", limparTodas));
+        ["limpar", "limparIndividuais"].forEach(id => $(id).addEventListener("click", limparTodas));
 
         carregarDoStorage();
         limparCamposInicio();
         render();
     </script>
 </body>
-  </html>
+</html>
